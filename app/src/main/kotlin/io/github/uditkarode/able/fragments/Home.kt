@@ -76,6 +76,8 @@ class Home : Fragment(), CoroutineScope, MusicService.MusicClient {
     private var _binding: HomeBinding? = null
     private val binding get() = _binding!!
 
+    private var isLoadingSongs = false
+
     companion object {
         var songAdapter: SongAdapter? = null
     }
@@ -146,6 +148,8 @@ class Home : Fragment(), CoroutineScope, MusicService.MusicClient {
         })
 
         if (songList.isEmpty()) {
+            isLoadingSongs = true
+            updateEmptyState()
             val ctx = requireContext()
             launch(Dispatchers.IO) {
                 val loadedSongs = Shared.getSongList(Constants.ableSongDir, ctx)
@@ -161,20 +165,31 @@ class Home : Fragment(), CoroutineScope, MusicService.MusicClient {
                     it.name.uppercase(Locale.getDefault())
                 }) else loadedSongs
                 launch(Dispatchers.Main) {
+                    isLoadingSongs = false
                     songList = sorted
                     songAdapter?.update(songList)
                     updateEmptyState()
                 }
             }
+        } else {
+            updateEmptyState()
         }
-        updateEmptyState()
     }
 
     private fun updateEmptyState() {
         if (_binding == null) return
         val isEmpty = songAdapter?.itemCount == 0
-        binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
-        binding.songs.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        if (isLoadingSongs) {
+            binding.loadingView.visibility = View.VISIBLE
+            binding.loadingView.playAnimation()
+            binding.emptyState.visibility = View.GONE
+            binding.songs.visibility = View.GONE
+        } else {
+            binding.loadingView.cancelAnimation()
+            binding.loadingView.visibility = View.GONE
+            binding.emptyState.visibility = if (isEmpty) View.VISIBLE else View.GONE
+            binding.songs.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        }
     }
 
     override fun onResume() {

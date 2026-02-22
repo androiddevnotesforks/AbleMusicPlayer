@@ -1,4 +1,5 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
@@ -32,6 +33,17 @@
             />
 
     </RelativeLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:lottie_renderMode="hardware"
+        app:lottie_fileName="musicfly.json"
+        app:lottie_progress="0.3080229"
+        app:lottie_loop="true"
+        app:lottie_autoPlay="false"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/empty_state"
